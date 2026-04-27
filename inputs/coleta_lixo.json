@@ -1,0 +1,87 @@
+[
+  {
+    "bairro": "Conjunto Habitacional Universitário",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": [5]
+  },
+  {
+    "bairro": "Jardim Pioneiros",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": [3]
+  },
+  {
+    "bairro": "Jardim Panorama",
+    "coleta_normal_dias": [1, 3, 5],
+    "coleta_seletiva_dias": []
+  },
+  {
+    "bairro": "Residencial Atlântico",
+    "coleta_normal_dias": [1, 3, 5],
+    "coleta_seletiva_dias": [2]
+  },
+  {
+    "bairro": "Conjunto Habitacional João Rocha",
+    "coleta_normal_dias": [1, 3, 5],
+    "coleta_seletiva_dias": []
+  },
+  {
+    "bairro": "Jardim Ivany Paiva Gatti",
+    "coleta_normal_dias": [1, 3, 5],
+    "coleta_seletiva_dias": []
+  },
+  {
+    "bairro": "Vila Santa Terezinha",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": []
+  },
+  {
+    "bairro": "Vila Independência",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": [3]
+  },
+  {
+    "bairro": "Jardim Progresso",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": []
+  },
+  {
+    "bairro": "Jardim Primavera",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": [5]
+  },
+  {
+    "bairro": "Jardim Vale Verde",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": [5]
+  },
+  {
+    "bairro": "Jardim Pérola",
+    "coleta_normal_dias": [1, 3, 5],
+    "coleta_seletiva_dias": []
+  },
+  {
+    "bairro": "Conjunto Habitacional Vitor Dantas",
+    "coleta_normal_dias": [1, 3, 5],
+    "coleta_seletiva_dias": []
+  },
+  {
+    "bairro": "Conjunto Habitacional Fortunato Sibim",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": [5]
+  },
+  {
+    "bairro": "Conjunto Habitacional União",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": [3]
+  },
+  {
+    "bairro": "Vila América",
+    "coleta_normal_dias": [0, 2, 4],
+    "coleta_seletiva_dias": []
+  },
+  {
+    "bairro": "Jardim Morumbi",
+    "coleta_normal_dias": [1, 3, 5],
+    "coleta_seletiva_dias": [2]
+  }
+]

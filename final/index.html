@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+<meta charset="UTF-8">
+<title>EcoPrioridade (Gestão Pública)</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{ --bg: #fff; --card: #F8F9FA; --primary: #1D9E75; --border: #E5E7EB; }
+body{font-family:'Sora',sans-serif; background: var(--bg); color: #111;}
+.eco{padding:1rem; max-width: 1400px; margin: 0 auto;   }
+
+body{
+    min-height: 100vh;
+    background: 
+        linear-gradient(#a3d8c7, #6a6767) padding-box, /* Fundo branco por dentro */
+        linear-gradient(135deg, #A7F3D0 0%, #00ffae 100%) border-box; /* Gradiente verde suave por fora */
+}
+
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.logo{display:flex;align-items:center;gap:10px; font-weight:600; font-size:18px;}
+.badge{background:#EAF3DE;color:#3B6D11;font-size:10px;padding:4px 10px;border-radius:20px;font-weight:600;}
+
+/* MAPA INTEGRADO */
+.map-wrap{position:relative;border-radius:12px;border:1px solid var(--border);background:var(--card);margin-bottom:1rem; height: 420px;}
+#map-frame{width:100%;height:100%;border:none;border-radius:12px;}
+
+.map-controls{position:absolute;top:15px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:20;}
+.tab-btn{font-size:11px;padding:8px 16px;border-radius:20px;border:none;cursor:pointer;font-weight:600;box-shadow:0 3px 2px rgba(0,0,0,.15);background:#fff;color:#555;transition:0.2s;}
+.tab-btn.active{background:var(--primary);color:#fff; transition:0.5s ease-in-out;}
+
+/* PAINÉIS INFERIORES */
+.panels{display:grid; grid-template-columns: 2fr 1fr; gap:15px;}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);}
+.card-title{font-size:12px;font-weight:600;text-transform:uppercase;color:#666;margin-bottom:1rem; border-bottom:1px solid #009903; padding-bottom:5px;}
+
+
+.bairro-row{display:flex;align-items:center;gap:12px;margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #f9f9f9;}
+.bairro-name{font-size:13px;font-weight:500;min-width:130px;}
+.bar-track{flex:1;background:#dadada;border-radius:4px;height:8px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.score-num{font-size:12px;font-family:'DM Mono',monospace;font-weight:600; width:30px;text-align:right;}
+.risk-badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;min-width:65px;text-align:center;}
+.btn-agir{background:#138513;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;}
+
+/* CORES PADRONIZADAS */
+.risk-critico, .fill-critico{background:#EF4444;color:#fff;}
+.risk-alto, .fill-alto   {background:#F97316;color:#fff;}
+.risk-medio, .fill-medio  {background:#EAB308;color:#fff;}
+.risk-baixo, .fill-baixo  {background:#22C55E;color:#fff;}
+
+/* ALERTAS IA */
+.alert-box{padding:10px;border-radius:8px;margin-bottom:8px;font-size:11px;line-height:1.4;display:flex;gap:8px;}
+.alert-box strong{display:block;margin-bottom:2px;}
+.alert-red{background:#FEE2E2;border-left:4px solid #EF4444;color:#991B1B;}
+.alert-blue{background:#edffef;border-left:4px solid #3bf667;color:rgb(24, 80, 10);}
+.alert-green{background:#DCFCE7;border-left:4px solid #22C55E;color:#166534;}
+
+/* MODAL DE TOMADA DE DECISÃO */
+#modal-acao{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:25px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:100;width:350px;border:1px solid var(--primary);}
+.overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:99;}
+select, button.confirm{width:100%;padding:10px;margin-top:15px;border-radius:6px;}
+button.confirm{background:var(--primary);color:white;border:none;font-weight:600;cursor:pointer;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="eco">
+  <div class="top-bar">
+    <div class="logo">🌿 EcoPrioridade</div>
+    <span class="badge">IA Preditiva Ativa</span>
+  </div>
+
+  <div class="map-wrap">
+    <div class="map-controls">
+      <button class="tab-btn active" id="btn-risco" onclick="mudarMapa('risco')">Score de Risco</button>
+      <button class="tab-btn" id="btn-regiao" onclick="mudarMapa('regiao')">Risco por Região</button>
+      <button class="tab-btn" id="btn-residuos" onclick="mudarMapa('residuos')">Volume de Resíduos</button>
+      <button class="tab-btn" id="btn-densidade" onclick="mudarMapa('densidade')">Densidade Populacional</button>
+    </div>
+    <iframe src="mapa_risco.html" id="map-frame"></iframe>
+  </div>
+
+  <div class="panels">
+    <div class="card">
+      <div class="card-title">Prioridade Técnica por Bairro</div>
+      <div id="lista-bairros">Aguardar sincronização de dados...</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Notificações Inteligentes (Alertas IA)</div>
+      <div id="lista-alertas"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="fecharModal()"></div>
+<div id="modal-acao">
+    <h3 style="margin-bottom:10px; font-size:16px;">Registar Ação</h3>
+    <p style="font-size:12px;color:#666;">Bairro Alvo: <strong id="bairro-alvo"></strong></p>
+    
+    <select id="select-acao">
+        <option value="desentupimento">Desentupimento de Bueiros (-30 Score)</option>
+        <option value="coleta_extra">Coleta de Lixo Imediata (-45 Score)</option>
+        <option value="fiscalizacao">Fiscalização de Descarte (-15 Score)</option>
+    </select>
+    
+    <button class="confirm" onclick="enviarAcao()">Confirmar Execução</button>
+</div>
+
+<script>
+let bairroSelecionado = "";
+let paineisOriginais = "";
+
+// Guarda o layout original ao carregar a página
+document.addEventListener("DOMContentLoaded", () => {
+    paineisOriginais = document.querySelector('.panels').innerHTML;
+});
+
+function mudarMapa(tipo) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-'+tipo).classList.add('active');
+    document.getElementById('map-frame').src = `mapa_${tipo}.html`;
+
+    const paineisContainer = document.querySelector('.panels');
+
+    // === INJEÇÃO DA ABA VISUAL ===
+    if (tipo === 'residuos') {
+        paineisContainer.innerHTML = `
+            <div class="card">
+                <div class="card-title">Volume de Resíduos (Estimativa T/Mês)</div>
+                <div style="position:relative; width:100%; height:200px"><canvas id="chartEstatico"></canvas></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Otimização de Rota (Dijkstra IA)</div>
+                <div style="max-height:160px; overflow-y:auto; font-size:12px; margin-bottom:10px; padding-right:5px;">
+                    <div style="display:flex; justify-content:space-between; padding:8px; background:#f9fafb; margin-bottom:4px; border-radius:6px; border: 1px solid #eee;">
+                      <span>Garagem Munic. &rarr; Vila S. Terezinha</span>
+                      <div><span style="font-family:monospace; font-weight:bold">1.2 km</span> | <span style="color:#16A34A; font-weight:bold">EcoRota</span></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px; background:#f9fafb; margin-bottom:4px; border-radius:6px; border: 1px solid #eee;">
+                      <span>Vila S. Terezinha &rarr; Jd. Panorama</span>
+                      <div><span style="font-family:monospace; font-weight:bold">2.4 km</span> | <span style="color:#16A34A; font-weight:bold">EcoRota</span></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px; background:#f9fafb; margin-bottom:4px; border-radius:6px; border: 1px solid #eee;">
+                      <span>Jd. Panorama &rarr; Conj. Universitário</span>
+                      <div><span style="font-family:monospace; font-weight:bold">0.8 km</span> | <span style="color:#16A34A; font-weight:bold">EcoRota</span></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px; background:#f9fafb; margin-bottom:4px; border-radius:6px; border: 1px solid #eee;">
+                      <span>Conj. Universitário &rarr; Garagem Munic.</span>
+                      <div><span style="font-family:monospace; font-weight:bold">3.1 km</span> | <span style="color:#16A34A; font-weight:bold">EcoRota</span></div>
+                    </div>
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid #eee;">
+                  <div><span style="font-size:10px; color:#666; display:block; text-transform:uppercase;">Total Percurso</span><span style="font-weight:bold; font-size:16px">7.5 km</span></div>
+                  <div style="text-align:right"><span style="font-size:10px; color:#16A34A; font-weight:bold; display:block; text-transform:uppercase;">CO₂ Poupado</span><span style="font-weight:bold; font-size:16px; color:#16A34A">↓ 4.8 kg</span></div>
+                </div>
+            </div>
+        `;
+
+        // Ativa o gráfico no painel criado
+        setTimeout(() => {
+            new Chart(document.getElementById('chartEstatico'), {
+                type:'bar',
+                data:{
+                  labels: ['Vila S.', 'Jd. Pano', 'Conj. Uni', 'Centro', 'Jd. Prim'],
+                  datasets:[
+                    {label:'Orgânico', data: [4.2, 3.8, 5.1, 6.0, 3.2], backgroundColor:'#1D9E75'},
+                    {label:'Reciclável', data: [1.5, 1.2, 1.8, 2.5, 1.0], backgroundColor:'#3B82F6'},
+                    {label:'Rejeito', data: [2.1, 1.9, 2.4, 3.5, 1.5], backgroundColor:'#FF746C'}
+                  ]
+                },
+                options:{responsive:true, maintainAspectRatio:false, scales:{x:{stacked:true},y:{stacked:true}}}
+            });
+        }, 100);
+
+    } else {
+        // === RESTAURA A LISTA E ALERTAS ===
+        if(paineisOriginais !== "") {
+            paineisContainer.innerHTML = paineisOriginais;
+            carregarDadosML(); // Recarrega os dados do Backend
+        }
+    }
+}
+
+function abrirModal(bairro) {
+    bairroSelecionado = bairro;
+    document.getElementById('bairro-alvo').innerText = bairro;
+    document.getElementById('overlay').style.display = 'block';
+    document.getElementById('modal-acao').style.display = 'block';
+}
+
+function fecharModal() {
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('modal-acao').style.display = 'none';
+}
+
+async function enviarAcao() {
+    const acao = document.getElementById('select-acao').value;
+    document.querySelector('.confirm').innerText = "A processar ML...";
+    
+    try {
+        await fetch('http://127.0.0.1:8000/api/acao', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ bairro: bairroSelecionado, acao: acao })
+        });
+        fecharModal();
+        document.querySelector('.confirm').innerText = "Confirmar Execução";
+        
+        // Magia: Recarrega o IFrame para o mapa atualizar automaticamente e as barras diminuírem!
+        document.getElementById('map-frame').src = document.getElementById('map-frame').src;
+        carregarDadosML();
+    } catch (e) { alert("Erro ao contactar o servidor Python!"); }
+}
+
+async function carregarDadosML() {
+    // Evita rodar se a aba de resíduos estiver aberta (pois os painéis não existem nesse momento)
+    if(!document.getElementById('lista-bairros')) return; 
+
+    try {
+        const res = await fetch('http://127.0.0.1:8000/api/mapa');
+        const geojson = await res.json();
+        
+        const agrupamento = {};
+        geojson.features.forEach(f => {
+            const p = f.properties;
+            if(!agrupamento[p.nome_bairro]) agrupamento[p.nome_bairro] = {score:0, pop:0, count:0};
+            agrupamento[p.nome_bairro].score += p.score_risco_final;
+            agrupamento[p.nome_bairro].pop += p.v0001;
+            agrupamento[p.nome_bairro].count++;
+        });
+
+        const bairros = Object.keys(agrupamento).map(nome => ({
+            nome, score: Math.round(agrupamento[nome].score / agrupamento[nome].count),
+            lixo_estimado: Math.round(agrupamento[nome].pop / 100) 
+        })).sort((a,b) => b.score - a.score);
+
+        let htmlLista = '';
+        let htmlAlertas = '';
+
+        bairros.forEach(b => {
+            let classe = b.score > 75 ? 'critico' : b.score > 50 ? 'alto' : b.score > 25 ? 'medio' : 'baixo';
+            let nivel = classe.toUpperCase();
+
+            // Renderiza as Barras Horizontais
+            htmlLista += `
+                <div class="bairro-row">
+                    <span class="bairro-name">${b.nome}</span>
+                    <div class="bar-track"><div class="bar-fill fill-${classe}" style="width:${b.score}%"></div></div>
+                    <span class="score-num" style="color:var(--${classe})">${b.score}</span>
+                    <span class="risk-badge risk-${classe}">${nivel}</span>
+                    <button class="btn-agir" onclick="abrirModal('${b.nome}')">⚙️ Agir</button>
+                </div>
+            `;
+
+            // IA Dispara as Notificações
+            if(b.score > 75) {
+                htmlAlertas += `<div class="alert-box alert-red">⚠️ <div><strong>Risco Crítico Detetado</strong> A IA Preditiva identifica alto risco em ${b.nome}. Sugestão: Desentupimento imediato de bueiros.</div></div>`;
+            }
+            if(b.lixo_estimado > 40) { 
+                htmlAlertas += `<div class="alert-box alert-blue">🚛 <div><strong>Recolha Prioritária (ODS 12)</strong> O volume de resíduos em ${b.nome} atingiu o limite operacional. Requer recolha extraordinária.</div></div>`;
+            }
+        });
+
+        if(htmlAlertas === '') htmlAlertas = `<div class="alert-box alert-green">✅ <div><strong>Tudo Operacional</strong> O motor preditivo não identificou anomalias críticas ou sobrecargas de resíduos.</div></div>`;
+
+        document.getElementById('lista-bairros').innerHTML = htmlLista;
+        document.getElementById('lista-alertas').innerHTML = htmlAlertas;
+
+    } catch(e) { console.error("Servidor offline", e); }
+}
+
+// Inicia o carregamento
+carregarDadosML();
+</script>
+</body>
+</html>
