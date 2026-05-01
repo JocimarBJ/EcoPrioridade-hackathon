@@ -1,7 +1,7 @@
 Projeto desenvolvido por 2 dias durante a Competição de Programação:
 # 🐝 Hackabee 6.0 - 2026- UTFPR 🐝
 ### Tema do Hackathon:
-Dados e Tecnologias como Ferramentas para Impulsionar a Inovação na Gestão Pública  
+Dados e Tecnologias como Ferramentas para Impulsionar a Inovação na Gestão Pública 
 
 # 🧠 EcoPrioridade - Gestão Inteligente de Zeladoria e Resíduos
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python) ![FastAPI](https://img.shields.io/badge/FastAPI-REST_API-009688?logo=fastapi) ![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker) ![GeoPandas](https://img.shields.io/badge/GeoPandas-Geospatial-139C5A) ![Machine Learning](https://img.shields.io/badge/Machine_Learning-scikit--learn-F7931E?logo=scikitlearn) ![Leaflet](https://img.shields.io/badge/Leaflet-Maps-199900?logo=leaflet) ![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-GIS-7EBC6F?logo=openstreetmap) ![IBGE](https://img.shields.io/badge/IBGE-Dados_Estatísticos-005CA9) ![NLP](https://img.shields.io/badge/NLP-TF_IDF_&_Logistic_Regression-purple) ![Smart City](https://img.shields.io/badge/Smart_City-Urban_Intelligence-black) ![ODS 11](https://img.shields.io/badge/ODS_11-Cidades_Sustentáveis-F99D26) ![ODS 12](https://img.shields.io/badge/ODS_12-Consumo_Responsável-BF8B2E)
